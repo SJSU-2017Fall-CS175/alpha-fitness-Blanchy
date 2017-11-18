@@ -20,17 +20,32 @@ public class PedometerService extends Service {
     public void onCreate() {
         super.onCreate();
         i = 0;
+        Timer t = new Timer();
+        t.schedule(new TimerTask()
+        {
+            public void run()
+            {
+                someMethod();
+            }
+        }, 0, 10000);
         mBinder = new MyIntentService.Stub() {
             public int countSteps() throws RemoteException {
-                Timer t = new Timer();
-                t.schedule(new TimerTask()
-                {
-                    public void run()
-                    {
-                        someMethod();
-                    }
-                }, 0, 10000);
                 return i;
+            }
+
+            @Override
+            public int calcAverage() throws RemoteException {
+                return 1;
+            }
+
+            @Override
+            public int calcMax() throws RemoteException {
+                return 2;
+            }
+
+            @Override
+            public int calcMin() throws RemoteException {
+                return 3;
             }
         };
     }
