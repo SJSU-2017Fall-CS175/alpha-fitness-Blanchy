@@ -8,32 +8,113 @@
 
     <LinearLayout
         android:id="@+id/averages"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        tools:layout_constraintTop_creator="1"
+        android:layout_width="582dp"
+        android:layout_height="97dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        tools:layout_constraintLeft_creator="1"
+        android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_editor_absoluteX="2dp">
 
         <TextView
             android:id="@+id/workoutdetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="239dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:text="Workout Details"
             android:textAlignment="center"
             android:textSize="30sp"
             android:textStyle="bold"
             android:typeface="sans" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:columnCount="3"
+            android:rowCount="3"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp"
+            android:layout_gravity="fill_horizontal"
+            >
+
+            <TextView
+                android:id="@+id/AVG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="50dp"
+                android:text="AVG"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="50dp"
+                android:text="MAX"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/min"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="50dp"
+                android:text="MIN"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/avgdata"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/maxdata"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/mindata"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/minmi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="min/mi"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/minmi2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="min/mi"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/minmi3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="min/mi"
+                android:textSize="18sp" />
+        </GridLayout>
+
     </LinearLayout>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="585dp"
+        android:layout_height="192dp"
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
@@ -43,5 +124,8 @@
         app:layout_constraintTop_toBottomOf="@+id/averages"
         tools:layout_constraintLeft_creator="1"
         android:layout_marginBottom="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="1.0" />
+
 </android.support.constraint.ConstraintLayout>
