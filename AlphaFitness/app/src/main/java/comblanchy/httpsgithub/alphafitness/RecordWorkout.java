@@ -17,14 +17,22 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecordWorkout extends AppCompatActivity {
+public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallback {
 
     MyIntentService remoteService;
     RemoteConnection remoteConnection = null;
+    private GoogleMap workoutMap;
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+    }
 
     class RemoteConnection implements ServiceConnection {
 
@@ -47,6 +55,8 @@ public class RecordWorkout extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_workout);
+
+        //TODO: retrieve database for service
 
         startRemote();
 
@@ -102,7 +112,7 @@ public class RecordWorkout extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        //TODO: destroy database for service
     }
 
     public void startRemote() {
