@@ -24,6 +24,7 @@ public class PedometerService extends Service implements SensorEventListener {
     private Sensor sensordetector;
 
     public PedometerService() {
+        
     }
 
     @Override
