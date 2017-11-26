@@ -21,7 +21,7 @@ public class PedometerService extends Service implements SensorEventListener {
     private int seconds;
 
     private SensorManager sensormanager;
-    private Sensor sensorcounter;
+    private Sensor sensordetector;
 
     public PedometerService() {
     }
@@ -30,9 +30,10 @@ public class PedometerService extends Service implements SensorEventListener {
     public void onCreate() {
 
         sensormanager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensorcounter = sensormanager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        sensormanager.registerListener(this, sensorcounter, SensorManager.SENSOR_DELAY_NORMAL);
+        sensordetector = sensormanager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        sensormanager.registerListener(this, sensordetector, SensorManager.SENSOR_DELAY_NORMAL);
 
+        seconds = 0;
         steps = 0;
         super.onCreate();
         i = 0;
@@ -41,12 +42,18 @@ public class PedometerService extends Service implements SensorEventListener {
         {
             public void run()
             {
-                someMethod();
+                seconds++;
             }
-        }, 0, 10000);
+        }, 0, 1000);
         mBinder = new MyIntentService.Stub() {
+            @Override
             public int countSteps() throws RemoteException {
-                return i;
+                return steps;
+            }
+
+            @Override
+            public int countSec() throws RemoteException {
+                return seconds;
             }
 
             @Override
@@ -61,7 +68,7 @@ public class PedometerService extends Service implements SensorEventListener {
 
             @Override
             public int calcMin() throws RemoteException {
-                return i+3;
+                return seconds;
             }
         };
     }
@@ -77,8 +84,8 @@ public class PedometerService extends Service implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorcounter.getType() == Sensor.TYPE_STEP_COUNTER) {
-            steps = (int) sensorEvent.values[0];
+        if (sensordetector.getType() == Sensor.TYPE_STEP_DETECTOR) {
+            steps++;
         }
     }
 

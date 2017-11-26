@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/workoutdetails"
-            android:layout_width="239dp"
+            android:layout_width="284dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="Workout Details"

@@ -6,6 +6,7 @@ package comblanchy.httpsgithub.alphafitness;
 interface MyIntentService {
 
     int countSteps();
+    int countSec();
     int calcAverage();
     int calcMax();
     int calcMin();
