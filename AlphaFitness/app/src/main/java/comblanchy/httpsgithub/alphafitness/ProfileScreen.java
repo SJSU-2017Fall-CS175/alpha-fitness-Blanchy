@@ -26,6 +26,7 @@ public class ProfileScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_profile_screen);
 
         weight = (EditText) findViewById(R.id.weightinput);
@@ -51,6 +52,8 @@ public class ProfileScreen extends AppCompatActivity {
 
         double distance = 0.0005*(DBsteps);
         double calories = 0.5 * mWeight / 20;
+
+
 
         avdist.setText((distance/7) + "");
         //avtime
