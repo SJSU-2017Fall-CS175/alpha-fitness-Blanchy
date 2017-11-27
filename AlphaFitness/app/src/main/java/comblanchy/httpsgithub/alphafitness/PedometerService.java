@@ -44,12 +44,29 @@ public class PedometerService extends Service implements SensorEventListener {
             public void run()
             {
                 seconds++;
+                steps = steps + 2;
+                Intent intent = new Intent("workoutSession");
+                intent.putExtra("steps",steps);
+                intent.putExtra("seconds",seconds);
+                sendBroadcast(intent);
             }
         }, 0, 1000);
+        Timer t2 = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Intent intent = new Intent("workoutDetails");
+                intent.putExtra("steps",steps);
+                intent.putExtra("seconds",seconds);
+                sendBroadcast(intent);
+            }
+        }, 0, 5000);
+
         mBinder = new MyIntentService.Stub() {
             @Override
             public int countSteps() throws RemoteException {
                 return steps;
+                //return steps;
             }
 
             @Override

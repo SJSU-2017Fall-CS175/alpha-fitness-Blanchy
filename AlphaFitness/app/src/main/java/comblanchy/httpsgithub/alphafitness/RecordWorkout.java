@@ -5,10 +5,14 @@
 
 package comblanchy.httpsgithub.alphafitness;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -56,6 +60,19 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
 
     private Handler stepTimeHandler = new Handler();
 
+    private LineChart lineChart;
+    private LineDataSet dataSetCalories;
+    private LineDataSet dataSetDistance;
+    private LineData lineData;
+
+    static final String STATE_SECONDS = "seconds";
+    static final String STATE_DISTANCE = "distance";
+    static final String STATE_STEPS = "steps";
+
+    private int weight = 1;
+    private int steps = 0;
+    private int seconds = 0;
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         workoutMap = googleMap;
@@ -73,7 +90,16 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             remoteService = MyIntentService.Stub.asInterface((IBinder) service);
             Toast.makeText(RecordWorkout.this,
                     "Remote Service connected.", Toast.LENGTH_LONG).show();
-            stepTimeHandler.postDelayed(updatePortrait, 20);
+            /*
+            if (findViewById(R.id.chart) != null) {
+                stepTimeHandler.postDelayed(updateDetails, 20);
+            }
+            else if (findViewById(R.id.timedata) != null) {
+                stepTimeHandler.postDelayed(updatePortrait, 20);
+            }
+            */
+            //registerReceiver(landscapeReceiver, new IntentFilter("workoutDetails"));
+            //registerReceiver(portraitReceiver,new IntentFilter("workoutSession"));
         }
 
         @Override
@@ -81,10 +107,46 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             remoteService = null;
             Toast.makeText(RecordWorkout.this,
                     "Remote Service disconnected.", Toast.LENGTH_LONG).show();
-
+            /*
             stepTimeHandler.removeCallbacks(updatePortrait);
+            stepTimeHandler.removeCallbacks(updateDetails);
+            */
         }
     }
+
+    private BroadcastReceiver portraitReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //Toast.makeText(RecordWorkout.this,
+            //        "broadcast recieved.", Toast.LENGTH_LONG).show();
+            if (intent.hasExtra("steps")) {
+                try {
+                    steps = intent.getIntExtra("steps", 0);
+                    seconds = intent.getIntExtra("seconds", 0);
+                    updateStepTime();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
+
+    private BroadcastReceiver landscapeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(RecordWorkout.this,
+                    "broadcast recieved.", Toast.LENGTH_SHORT).show();
+            if (intent.hasExtra("steps")) {
+                try {
+                    steps = intent.getIntExtra("steps", 0);
+                    seconds = intent.getIntExtra("seconds", 0);
+                    updateLandscape(intent.getIntExtra("steps", 0), intent.getIntExtra("seconds", 0));
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,29 +157,49 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
         //TODO: retrieve database for service
 
         Configuration config = getResources().getConfiguration();
+
         if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (findViewById(R.id.chart) != null) {
-                LineChart chart = (LineChart) findViewById(R.id.chart);
+                lineChart = (LineChart) findViewById(R.id.chart);
 
-                int[] sample = {2,4,6};
-                int[] sample2 = {1,3,7};
+                List<Entry> calorieEntries = new ArrayList<Entry>();
+                List<Entry> distanceEntries = new ArrayList<Entry>();
 
-                List<Entry> entries = new ArrayList<Entry>();
+                Entry sample = new Entry(0, (float) 0);
 
-                entries.add(new Entry(sample[0], sample2[0]));
-                entries.add(new Entry(sample[1], sample2[1]));
-                entries.add(new Entry(sample[2], sample2[2]));
+                calorieEntries.add(sample);
+                distanceEntries.add(sample);
 
-                LineDataSet dataSet = new LineDataSet(entries, "Label");
+                dataSetCalories = new LineDataSet(calorieEntries, "CALORIES");
+                dataSetDistance = new LineDataSet(distanceEntries, "DISTANCE");
 
-                LineData lineData = new LineData(dataSet);
-                chart.setData(lineData);
-                chart.invalidate(); // refresh
+                dataSetCalories.setColor(Color.MAGENTA);
+                dataSetDistance.setColor(Color.GREEN);
+
+                lineData = new LineData(dataSetCalories, dataSetDistance);
+                lineChart.setData(lineData);
+                lineChart.invalidate(); // refresh
+
             }
+            if (isConnected) {
+                startRemote();
+
+                //registerReceiver(portraitReceiver,new IntentFilter("workoutSession"));
+            }
+            registerReceiver(landscapeReceiver, new IntentFilter("workoutDetails"));
         } else {
             distancedata = (TextView) findViewById(R.id.distancedata);
             timedata = (TextView) findViewById(R.id.timedata);
+
+            if (isConnected) {
+                startRemote();
+                //registerReceiver(landscapeReceiver, new IntentFilter("workoutDetails"));
+                registerReceiver(portraitReceiver,new IntentFilter("workoutSession"));
+            }
         }
+
+
+
     }
 
     private Runnable updatePortrait = new Runnable() {
@@ -132,8 +214,26 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
         }
     };
 
+    /*
+    private Runnable updateDetails = new Runnable() {
+        @Override
+        public void run() {
+            try {
+
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            stepTimeHandler.postDelayed(this, 10000);
+        }
+    };
+    */
+
     public void toProfile(View view) {
         Intent intent = new Intent(this, ProfileScreen.class);
+        intent.putExtra(STATE_STEPS, steps);
+        intent.putExtra(STATE_SECONDS, seconds);
+        intent.putExtra("Connection", true);
+
         startActivity(intent);
     }
 
@@ -177,6 +277,7 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             bindService(intent, remoteConnection, 0);
             isConnected = true;
         }
+        registerReceiver(portraitReceiver,new IntentFilter("workoutSession"));
     }
 
     public void stopRemote() {
@@ -189,7 +290,7 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
         isConnected = false;
 
         //TODO: access database, save
-        
+
     }
 
     public void test(View view) throws RemoteException {
@@ -212,17 +313,47 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-    public void updateLandscape() throws RemoteException {
+    private int prevSteps = 0;
 
+    public void updateLandscape(int steps, int sec) throws RemoteException {
+
+        addToChart(steps, sec);
+
+        TextView avgdata = (TextView) findViewById(R.id.avgdata);
+        TextView maxdata = (TextView) findViewById(R.id.maxdata);
+        TextView mindata = (TextView) findViewById(R.id.mindata);
+
+        double max = Double.parseDouble((String) maxdata.getText());
+        double min = Double.parseDouble((String) mindata.getText());
+
+        double avg = steps/sec;
+
+        if (avg > max) {
+            maxdata.setText(avg + "");
+        }
+        else if (avg < min) {
+            mindata.setText(avg + "");
+        }
+
+        avgdata.setText(avg +"");
+        prevSteps = steps;
     }
 
-    public void addToChart() {
+    public void addToChart(int steps, int sec) {
+        double datadistance = steps/2000;
+        double datacalories = 0.5 * weight / 20;
 
+        dataSetCalories.addEntry(new Entry(sec, (float) datacalories));
+        dataSetDistance.addEntry(new Entry(sec, (float) datadistance));
+        lineData.notifyDataChanged(); // let the data know a dataSet changed
+        lineChart.notifyDataSetChanged(); // let the chart know it's data changed
+        lineChart.invalidate();
     }
 
     /**
      * https://stackoverflow.com/questions/9159896/android-update-ui-from-handler-every-second
      * https://stackoverflow.com/questions/18671067/how-to-stop-handler-runnable
      */
+
 
 }

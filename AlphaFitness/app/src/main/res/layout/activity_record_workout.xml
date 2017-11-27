@@ -91,21 +91,21 @@
                 android:id="@+id/minmi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="min/mi"
+                android:text="sec/step"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/minmi2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="min/mi"
+                android:text="sec/step"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/minmi3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="min/mi"
+                android:text="sec/step"
                 android:textSize="18sp" />
         </GridLayout>
 

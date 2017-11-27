@@ -33,8 +33,10 @@ public class MyContentProvider extends ContentProvider {
     static final String _ID = "_id";
     static final String NAME = "name";
     static final String GENDER = "gender";
-    static final String TIME = "";
-    static final String STEPS = "";
+    static final String WEIGHT = "weight";
+    static final String STEPS = "steps";
+    static final String TIME = "time";
+
 
     private static HashMap<String, String> USER_PROJECTION_MAP;
 
@@ -65,9 +67,12 @@ public class MyContentProvider extends ContentProvider {
                     " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     " name TEXT NOT NULL, " +
                     " gender TEXT NOT NULL, " +
+                    " weight INT NOT NULL, " +
                     " steps INT NOT NULL, " +
                     " time INT NOT NULL, " +
                     ");";
+    static final String POPULATE_VALUES = "INSERT INTO " + USER_TABLE_NAME + " " +
+            "VALUES ('Beatrice', 'female', 150, 4000, 15000);";
 
     private static class DB extends SQLiteOpenHelper
     {
@@ -79,6 +84,7 @@ public class MyContentProvider extends ContentProvider {
         public void onCreate(SQLiteDatabase db)
         {
             db.execSQL(CREATE_DB_TABLE);
+            db.execSQL(POPULATE_VALUES);
         }
 
         @Override
