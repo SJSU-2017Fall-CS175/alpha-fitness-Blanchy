@@ -2,6 +2,8 @@ package comblanchy.httpsgithub.alphafitness;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -45,6 +47,23 @@ public class ProfileScreen extends AppCompatActivity {
         //TODO: get DB stats and fill name, gender, DBsteps, DBtime, weight
 
         populate();
+
+        weight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                populate();
+            }
+        });
     }
 
     public void populate() {
@@ -52,8 +71,6 @@ public class ProfileScreen extends AppCompatActivity {
 
         double distance = 0.0005*(DBsteps);
         double calories = 0.5 * mWeight / 20;
-
-
 
         avdist.setText((distance/7) + "");
         //avtime
@@ -66,7 +83,8 @@ public class ProfileScreen extends AppCompatActivity {
         ttcalories.setText(calories + "");
     }
 
-    public void update() {
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

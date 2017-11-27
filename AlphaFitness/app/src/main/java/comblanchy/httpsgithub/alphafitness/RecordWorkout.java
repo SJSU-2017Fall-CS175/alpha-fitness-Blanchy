@@ -46,7 +46,6 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
     RemoteConnection remoteConnection = null;
     private boolean isConnected = false;
     private GoogleMap workoutMap;
-    private MapView mapView;
 
     private TextView distancedata;
     private TextView timedata;
@@ -74,6 +73,7 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             remoteService = MyIntentService.Stub.asInterface((IBinder) service);
             Toast.makeText(RecordWorkout.this,
                     "Remote Service connected.", Toast.LENGTH_LONG).show();
+            stepTimeHandler.postDelayed(updatePortrait, 20);
         }
 
         @Override
@@ -81,6 +81,8 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             remoteService = null;
             Toast.makeText(RecordWorkout.this,
                     "Remote Service disconnected.", Toast.LENGTH_LONG).show();
+
+            stepTimeHandler.removeCallbacks(updatePortrait);
         }
     }
 
@@ -88,7 +90,8 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_workout);
-        startRemote();
+        //startRemote();
+        //remoteConnection = new RemoteConnection();
         //TODO: retrieve database for service
 
         Configuration config = getResources().getConfiguration();
@@ -141,14 +144,9 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             //TODO: start workout
             if (remoteConnection == null) {
                 startRemote();
-                //stepTimeHandler.postDelayed(updatePortrait, 20);
             }
-            try {
-                Toast.makeText(RecordWorkout.this,
-                        "Using service: " + remoteService.calcAverage(), Toast.LENGTH_LONG).show();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            Toast.makeText(RecordWorkout.this,
+                    "Using service", Toast.LENGTH_LONG).show();
         }
         else {
             b.setText("Start Workout");
@@ -156,6 +154,7 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             stopRemote();
             Toast.makeText(RecordWorkout.this,
                     "Destroy service.", Toast.LENGTH_LONG).show();
+
         }
     }
 
@@ -188,7 +187,9 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             Log.d("unbinding", "set to null");
         }
         isConnected = false;
+
         //TODO: access database, save
+        
     }
 
     public void test(View view) throws RemoteException {
@@ -209,6 +210,14 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             timedata.setText(minutes + ":" + seconds);
             distancedata.setText((remoteService.countSteps() *  0.0005) + "");
         }
+    }
+
+    public void updateLandscape() throws RemoteException {
+
+    }
+
+    public void addToChart() {
+
     }
 
     /**
