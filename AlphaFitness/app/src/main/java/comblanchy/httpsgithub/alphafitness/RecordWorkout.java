@@ -123,7 +123,7 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
                 try {
                     steps = intent.getIntExtra("steps", 0);
                     seconds = intent.getIntExtra("seconds", 0);
-                    updateStepTime();
+                    updateStepTime(seconds, steps);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -201,7 +201,7 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
 
 
     }
-
+/*
     private Runnable updatePortrait = new Runnable() {
         @Override
         public void run() {
@@ -213,6 +213,7 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
             }
         }
     };
+    */
 
     /*
     private Runnable updateDetails = new Runnable() {
@@ -293,23 +294,13 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
 
     }
 
-    public void test(View view) throws RemoteException {
-        Button tester = (Button) findViewById(R.id.button2);
+    public void updateStepTime(int seconds, int steps) throws RemoteException {
         if (remoteConnection != null) {
-            updateStepTime();
-        }
-        else {
-            tester.setText("not connected");
-        }
-    }
-
-    public void updateStepTime() throws RemoteException {
-        if (remoteConnection != null) {
-            int seconds = remoteService.countSec();
+            int sec = seconds;
             int minutes = seconds/60;
-            seconds = seconds % 60;
+            sec = sec % 60;
             timedata.setText(minutes + ":" + seconds);
-            distancedata.setText((remoteService.countSteps() *  0.0005) + "");
+            distancedata.setText((steps *  0.0005) + "");
         }
     }
 

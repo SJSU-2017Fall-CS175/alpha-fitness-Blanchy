@@ -206,4 +206,8 @@ public class MyContentProvider extends ContentProvider {
         notifyChange(uri);
         return count;
     }
+
+    public SQLiteDatabase getDB() {
+        return db;
+    }
 }

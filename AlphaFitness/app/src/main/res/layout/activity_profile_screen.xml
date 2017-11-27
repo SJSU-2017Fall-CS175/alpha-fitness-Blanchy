@@ -36,7 +36,7 @@
                 app:srcCompat="@mipmap/ic_launcher" />
 
             <EditText
-                android:id="@+id/editText3"
+                android:id="@+id/nameinput"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:ems="10"
@@ -103,12 +103,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <Button
-                        android:id="@+id/changebutton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:text="Set Changes" />
                 </TableRow>
 
                 <TableRow

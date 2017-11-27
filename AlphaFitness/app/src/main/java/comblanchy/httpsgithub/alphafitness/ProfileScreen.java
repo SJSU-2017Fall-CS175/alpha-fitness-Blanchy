@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 public class ProfileScreen extends AppCompatActivity {
 
+    private EditText name;
     private EditText weight;
     private EditText gender;
 
@@ -27,11 +28,15 @@ public class ProfileScreen extends AppCompatActivity {
     private TextView ttworkouts;
     private TextView ttcalories;
 
+    WorkoutDBHelper db = new WorkoutDBHelper(this);
     private int DBsteps = 0;
     private int DBtime = 0;
 
     private int tempSteps = 0;
     private int tempTime = 0;
+
+    static final String PROVIDER = "com.wearable.myprovider";
+    static final String URL = "content://" + PROVIDER + "/user";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,7 @@ public class ProfileScreen extends AppCompatActivity {
 
         setContentView(R.layout.activity_profile_screen);
 
+        name = (EditText) findViewById(R.id.nameinput);
         weight = (EditText) findViewById(R.id.weightinput);
         gender = (EditText) findViewById(R.id.genderinput);
 
@@ -58,9 +64,10 @@ public class ProfileScreen extends AppCompatActivity {
         ttdist = (TextView) findViewById(R.id.ttdistdata); // 0.0005 mi * 1 step
         tttime = (TextView) findViewById(R.id.tttimedata);
         ttworkouts = (TextView) findViewById(R.id.ttworkoutdata);
-        ttcalories = (TextView) findViewById(R.id.ttcaldata); // 0.5 * weight / 20 minutes
+        ttcalories = (TextView) findViewById(R.id.ttcaldata); // 0.5 * weight  / 20 steps
 
-        retrieveRecord();
+        //DBsteps = db.getSumInt(db.STEPS);
+        //DBtime = db.getSumInt(db.TIME);
 
         populate();
 
@@ -83,6 +90,11 @@ public class ProfileScreen extends AppCompatActivity {
     }
 
     public void populate() {
+
+        //name.setText(db.getRecentString(db.NAME));
+        //gender.setText(db.getRecentString(db.GENDER));
+        //weight.setText(db.getRecentString(db.WEIGHT));
+
         int mWeight = 1;
         if (weight.getText().length() > 0) {
             mWeight = Integer.parseInt(String.valueOf(weight.getText()));
@@ -91,56 +103,29 @@ public class ProfileScreen extends AppCompatActivity {
             weight.setText("1");
         }
 
-        double steps = DBsteps + DBtime;
+        double steps = DBsteps + tempSteps;
         double distance = 0.0005*(steps);
-        double calories = 0.5 * mWeight / 20;
+        double calories = (0.5 * mWeight / 20) * steps;
         double time = DBtime + tempTime;
 
+        int workouts = db.getNumRows();
+
         avdist.setText((distance/7) + "");
-        avtime.setText((time/7) + "");
-        avworkouts.setText("");
+        avtime.setText((time/7) + " seconds");
+        avworkouts.setText((workouts/7) +"");
         avcalories.setText((calories/7) + "");
 
         ttdist.setText(distance + "");
         tttime.setText(time + " seconds");
-        ttworkouts.setText("");
+        ttworkouts.setText(workouts + "");
         ttcalories.setText(calories + "");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //TODO: store in database
     }
 
-    public void retrieveRecord() {
-        String URL = "content://com.wearable.myprovider/user";
-        Uri devices = Uri.parse(URL);
-        Cursor c = managedQuery(devices, null, null, null, "name");
 
-        if (c.moveToFirst()) {
-            do {
-                Toast.makeText(ProfileScreen.this,
-                        c.getString(c.getColumnIndex(MyContentProvider._ID))
-                                + ", "
-                                +  c.getString(
-                                c.getColumnIndex( MyContentProvider.NAME))
-                                + ", "
-                                + c.getString(
-                                c.getColumnIndex( MyContentProvider.GENDER))
-                                + ", "
-                                + c.getString(
-                                c.getColumnIndex( MyContentProvider.WEIGHT))
-                                + ", "
-                                + c.getString(
-                                c.getColumnIndex( MyContentProvider.STEPS))
-                                + ", "
-                                + c.getString(
-                                c.getColumnIndex( MyContentProvider.TIME))
-                        ,
-                        Toast.LENGTH_SHORT).show();
-            } while (c.moveToNext());
-        }
-    }
 }
 
