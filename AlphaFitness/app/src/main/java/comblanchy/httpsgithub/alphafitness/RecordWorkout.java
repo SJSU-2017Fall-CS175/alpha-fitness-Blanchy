@@ -36,6 +36,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -190,6 +191,9 @@ public class RecordWorkout extends AppCompatActivity implements OnMapReadyCallba
         } else {
             distancedata = (TextView) findViewById(R.id.distancedata);
             timedata = (TextView) findViewById(R.id.timedata);
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
 
             if (isConnected) {
                 startRemote();

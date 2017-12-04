@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.util.HashMap;
 
 /**
  * Created by blanchypolangcos on 11/26/17.
@@ -21,18 +24,20 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
 
     static final String DATABASE_NAME = "workoutDB";
     static final String USER_TABLE_NAME = "user";
-    static final int DATABASE_VERSION = 1;
-    static final String CREATE_DB_TABLE =
-            " CREATE TABLE " + USER_TABLE_NAME +
-                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    " name TEXT NOT NULL, " +
-                    " gender TEXT NOT NULL, " +
-                    " weight INT NOT NULL, " +
-                    " steps INT NOT NULL, " +
-                    " time INT NOT NULL" +
+    private static final int DATABASE_VERSION = 1;
+    private static final String CREATE_DB_TABLE =
+            "CREATE TABLE " + USER_TABLE_NAME +
+                    " (_id INTEGER PRIMARY KEY, " +
+                    " name TEXT, " +
+                    " gender TEXT, " +
+                    " weight INT, " +
+                    " steps INT, " +
+                    " time INT" +
                     ");";
-    static final String POPULATE_VALUES = "INSERT INTO " + USER_TABLE_NAME + " " +
-            "VALUES ('Beatrice', 'female', 150, 4000, 15000);";
+    static final String POPULATE_VALUES = "INSERT INTO " + USER_TABLE_NAME +
+            " VALUES (0, 'Beatrice', 'female', 150, 4000, 15000);";
+
+    private int workoutCount;
 
     public WorkoutDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION );
@@ -41,11 +46,15 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_DB_TABLE);
+        db.execSQL(POPULATE_VALUES);
+        Log.d("DATABASE", "is created");
+        workoutCount = 1;
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DATABASE_NAME);
+        onCreate(sqLiteDatabase);
     }
 
     public String getRecentString(String value) {
@@ -57,22 +66,57 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
         return c.getString(0);
     }
 
-    public int getSumInt(String value) {
+    public int getSumSteps() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT SUM(" + value + ") FROM " + USER_TABLE_NAME,null);
-        if (c != null && c.moveToFirst() ) {
-            c.moveToLast();
+        Cursor c = db.rawQuery("SELECT SUM(" + STEPS + ") FROM " + USER_TABLE_NAME, null);
+        if(c.moveToFirst())
+        {
+            return c.getInt(0);
         }
-        return c.getInt(0);
+        else
+        {
+            return 0;
+        }
+
     }
 
-    public int getNumRows() {
+    public int getSumSeconds() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + USER_TABLE_NAME,null);
-        if (c != null && c.moveToFirst() ) {
-            c.moveToLast();
+        Cursor c = db.rawQuery("SELECT sum(" + TIME + ") FROM " + USER_TABLE_NAME, null);
+        Log.d("Cursor, sum of sec", String.valueOf(c.moveToFirst()));
+        if(c.moveToFirst())
+        {
+            //Log.d("Cursor for seconds", "ACCESSED and int is " + c.getColumnCount());
+            return c.getInt(0);
         }
-        return c.getInt(0);
+        else
+        {
+            return 0;
+        }
+    }
+
+    public WorkoutEntry getLatestProfile() {
+        Log.d("Entry check", "retrieving from DB");
+        WorkoutEntry we = new WorkoutEntry();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + USER_TABLE_NAME, null);
+        Log.d("Query check", "query made");
+        if(c.moveToFirst()) {
+            Log.d("Cursor check", String.valueOf(c.moveToFirst()));
+            c.moveToLast();
+            we.set_id(c.getInt(0));
+            Log.d("Entry check",c.getInt(0) +"");
+            we.setName(c.getString(1));
+            Log.d("Entry check",c.getString(1));
+            we.setGender(c.getString(2));
+            we.setWeight(c.getInt(3));
+            close();
+        }
+        return we;
+    }
+
+    public int getNumEntries() {
+        return workoutCount;
     }
 
     /*public String getName() {
@@ -96,16 +140,38 @@ public class WorkoutDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
     }*/
 
-    public void addEntry(String name, String gender, int weight, int steps, int time) {
+    public void addEntry(WorkoutEntry we) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        workoutCount++;
+
         ContentValues values = new ContentValues();
-        values.put(NAME, name);
-        values.put(GENDER, gender);
-        values.put(WEIGHT, weight);
-        values.put(STEPS, steps);
-        values.put(TIME, time);
+        values.put(_ID, workoutCount);
+        values.put(NAME, we.getName());
+        values.put(GENDER, we.getGender());
+        values.put(WEIGHT, we.getWeight());
+        values.put(STEPS, we.getSteps());
+        values.put(TIME, we.getSeconds());
 
         long newRowId = db.insert(USER_TABLE_NAME, null, values);
+
+        db.close();
+    }
+
+    public void editEntry(WorkoutEntry we) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(NAME, we.getName());
+        values.put(GENDER, we.getGender());
+        values.put(WEIGHT, we.getWeight());
+        values.put(STEPS, we.getSteps());
+        values.put(TIME, we.getSeconds());
+
+        db.update(USER_TABLE_NAME, values, _ID + " = ?", new String[] {
+                String.valueOf(we.get_id())
+        });
+
+        db.close();
     }
 }
